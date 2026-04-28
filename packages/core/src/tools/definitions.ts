@@ -302,36 +302,6 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     }
   },
   {
-    name: 'create_ui_tree',
-    category: 'write',
-    description: 'Create an entire instance hierarchy from a nested JSON tree in one call.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        parentPath: {
-          type: 'string',
-          description: 'Parent instance path'
-        },
-        tree: {
-          type: 'object',
-          description: 'Root node: { className: string, name?: string, properties?: { prop: value }, children?: [node, ...] }',
-          properties: {
-            className: { type: 'string', description: 'Roblox class name' },
-            name: { type: 'string', description: 'Instance name' },
-            properties: { type: 'object', description: 'Property name to value map' },
-            children: {
-              type: 'array',
-              description: 'Child nodes with same structure',
-              items: { type: 'object' }
-            }
-          },
-          required: ['className']
-        }
-      },
-      required: ['parentPath', 'tree']
-    }
-  },
-  {
     name: 'mass_create_objects',
     category: 'write',
     description: 'Create multiple instances. Each can have optional properties.',

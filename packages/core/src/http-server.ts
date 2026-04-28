@@ -37,7 +37,6 @@ const TOOL_HANDLERS: Record<string, ToolHandler> = {
   mass_set_property: (tools, body) => tools.massSetProperty(body.paths, body.propertyName, body.propertyValue),
   mass_get_property: (tools, body) => tools.massGetProperty(body.paths, body.propertyName),
   create_object: (tools, body) => tools.createObject(body.className, body.parent, body.name, body.properties),
-  create_ui_tree: (tools, body) => tools.createUITree(body.parentPath, body.tree),
   mass_create_objects: (tools, body) => tools.massCreateObjects(body.objects),
   delete_object: (tools, body) => tools.deleteObject(body.instancePath),
   smart_duplicate: (tools, body) => tools.smartDuplicate(body.instancePath, body.count, body.options),

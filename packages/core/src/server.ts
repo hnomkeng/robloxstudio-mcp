@@ -107,8 +107,6 @@ export class RobloxStudioMCPServer {
 
           case 'create_object':
             return await this.tools.createObject((args as any)?.className as string, (args as any)?.parent as string, (args as any)?.name, (args as any)?.properties);
-          case 'create_ui_tree':
-            return await this.tools.createUITree((args as any)?.parentPath as string, (args as any)?.tree);
           case 'mass_create_objects':
             return await this.tools.massCreateObjects((args as any)?.objects);
           case 'delete_object':

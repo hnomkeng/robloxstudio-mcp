@@ -47,7 +47,6 @@ const routeMap: Record<string, Handler> = {
 	"/api/mass-set-property": PropertyHandlers.massSetProperty,
 	"/api/mass-get-property": PropertyHandlers.massGetProperty,
 	"/api/create-object": InstanceHandlers.createObject,
-	"/api/create-ui-tree": InstanceHandlers.createUITree,
 	"/api/mass-create-objects": InstanceHandlers.massCreateObjects,
 	"/api/delete-object": InstanceHandlers.deleteObject,
 	"/api/smart-duplicate": InstanceHandlers.smartDuplicate,

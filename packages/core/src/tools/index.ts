@@ -275,14 +275,6 @@ export class RobloxStudioTools {
     };
   }
 
-  async createUITree(parentPath: string, tree: any) {
-    if (!parentPath || !tree) {
-      throw new Error('parentPath and tree are required for create_ui_tree');
-    }
-    const response = await this.client.request('/api/create-ui-tree', { parentPath, tree });
-    return { content: [{ type: 'text', text: JSON.stringify(response) }] };
-  }
-
   async massCreateObjects(objects: Array<{className: string, parent: string, name?: string, properties?: Record<string, any>}>) {
     if (!objects || objects.length === 0) {
       throw new Error('Objects array is required for mass_create_objects');

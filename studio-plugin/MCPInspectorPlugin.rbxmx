@@ -87,7 +87,6 @@ local routeMap = {
 	["/api/mass-set-property"] = PropertyHandlers.massSetProperty,
 	["/api/mass-get-property"] = PropertyHandlers.massGetProperty,
 	["/api/create-object"] = InstanceHandlers.createObject,
-	["/api/create-ui-tree"] = InstanceHandlers.createUITree,
 	["/api/mass-create-objects"] = InstanceHandlers.massCreateObjects,
 	["/api/delete-object"] = InstanceHandlers.deleteObject,
 	["/api/smart-duplicate"] = InstanceHandlers.smartDuplicate,
@@ -2183,101 +2182,6 @@ local function moveObject(requestData)
 		error = `Failed to move object: {result}`,
 	}
 end
-local function createUITree(requestData)
-	local tree = requestData.tree
-	local parentPath = requestData.parentPath
-	if not tree or not (parentPath ~= "" and parentPath) then
-		return {
-			error = "Tree object and parentPath are required",
-		}
-	end
-	local parent = getInstanceByPath(parentPath)
-	if not parent then
-		return {
-			error = `Parent not found: {parentPath}`,
-		}
-	end
-	local _value = tree.className
-	local _condition = not (_value ~= 0 and _value == _value and _value ~= "" and _value)
-	if not _condition then
-		local _className = tree.className
-		_condition = not (type(_className) == "string")
-	end
-	if _condition then
-		return {
-			error = "Tree root must have a className string",
-		}
-	end
-	local MAX_DEPTH = 20
-	local recordingId = beginRecording("Create UI tree")
-	local totalCreated = 0
-	local totalFailed = 0
-	local errors = {}
-	local function createNode(nodeData, nodeParent, depth)
-		if depth > MAX_DEPTH then
-			totalFailed += 1
-			local _arg0 = `Max depth ({MAX_DEPTH}) exceeded`
-			table.insert(errors, _arg0)
-			return nil
-		end
-		local className = nodeData.className
-		if not (className ~= "" and className) then
-			totalFailed += 1
-			table.insert(errors, "Node missing className")
-			return nil
-		end
-		local success, instance = pcall(function()
-			local inst = Instance.new(className)
-			local _value_1 = nodeData.name
-			if _value_1 ~= 0 and _value_1 == _value_1 and _value_1 ~= "" and _value_1 then
-				inst.Name = nodeData.name
-			end
-			local props = nodeData.properties
-			if props and type(props) == "table" then
-				for propName, propValue in pairs(props) do
-					pcall(function()
-						local converted = convertPropertyValue(inst, propName, propValue)
-						inst[propName] = if converted ~= nil then converted else propValue
-					end)
-				end
-			end
-			inst.Parent = nodeParent
-			return inst
-		end)
-		if not success or not instance then
-			totalFailed += 1
-			local _arg0 = `Failed to create {className}: {tostring(instance)}`
-			table.insert(errors, _arg0)
-			return nil
-		end
-		totalCreated += 1
-		local children = nodeData.children
-		if children and type(children) == "table" then
-			for _, childData in children do
-				if type(childData) == "table" then
-					createNode(childData, instance, depth + 1)
-				end
-			end
-		end
-		return instance
-	end
-	local rootInstance = createNode(tree, parent, 0)
-	finishRecording(recordingId, totalCreated > 0)
-	if not rootInstance then
-		return {
-			error = `Failed to create root node ({tree.className})`,
-			totalCreated = totalCreated,
-			totalFailed = totalFailed,
-			errors = errors,
-		}
-	end
-	return {
-		totalCreated = totalCreated,
-		totalFailed = totalFailed,
-		rootPath = getInstancePath(rootInstance),
-		errors = if #errors > 0 then errors else nil,
-	}
-end
 return {
 	createObject = createObject,
 	deleteObject = deleteObject,
@@ -2286,7 +2190,6 @@ return {
 	massDuplicate = massDuplicate,
 	cloneObject = cloneObject,
 	moveObject = moveObject,
-	createUITree = createUITree,
 }
 ]]></string>
           </Properties>

@@ -141,8 +141,6 @@ export class RobloxStudioMCPServer {
           case 'delete_script_lines':
             return await this.tools.deleteScriptLines((args as any)?.instancePath as string, (args as any)?.startLine as number, (args as any)?.endLine as number);
 
-          case 'get_attribute':
-            return await this.tools.getAttribute((args as any)?.instancePath as string, (args as any)?.attributeName as string);
           case 'set_attribute':
             return await this.tools.setAttribute((args as any)?.instancePath as string, (args as any)?.attributeName as string, (args as any)?.attributeValue, (args as any)?.valueType);
           case 'get_attributes':
@@ -206,24 +204,16 @@ export class RobloxStudioMCPServer {
             return await this.tools.insertAsset((args as any)?.assetId as number, (args as any)?.parentPath, (args as any)?.position);
           case 'preview_asset':
             return await this.tools.previewAsset((args as any)?.assetId as number, (args as any)?.includeProperties, (args as any)?.maxDepth);
-          case 'upload_decal':
-            return await this.tools.uploadDecal((args as any)?.filePath as string, (args as any)?.displayName as string, (args as any)?.description, (args as any)?.userId, (args as any)?.groupId);
           case 'upload_asset':
             return await this.tools.uploadAsset((args as any)?.filePath as string, (args as any)?.assetType as string, (args as any)?.displayName as string, (args as any)?.description, (args as any)?.userId, (args as any)?.groupId);
           case 'clone_object':
             return await this.tools.cloneObject((args as any)?.instancePath as string, (args as any)?.targetParentPath as string);
-          case 'move_object':
-            return await this.tools.moveObject((args as any)?.instancePath as string, (args as any)?.targetParentPath as string);
-          case 'rename_object':
-            return await this.tools.renameObject((args as any)?.instancePath as string, (args as any)?.newName as string);
           case 'get_descendants':
             return await this.tools.getDescendants((args as any)?.instancePath as string, (args as any)?.maxDepth, (args as any)?.classFilter);
           case 'compare_instances':
             return await this.tools.compareInstances((args as any)?.instancePathA as string, (args as any)?.instancePathB as string);
           case 'get_output_log':
             return await this.tools.getOutputLog((args as any)?.maxEntries, (args as any)?.messageType);
-          case 'get_script_analysis':
-            return await this.tools.getScriptAnalysis((args as any)?.instancePath as string);
           case 'bulk_set_attributes':
             return await this.tools.bulkSetAttributes((args as any)?.instancePath as string, (args as any)?.attributes);
 

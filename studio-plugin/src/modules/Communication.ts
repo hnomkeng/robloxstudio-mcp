@@ -52,7 +52,6 @@ const routeMap: Record<string, Handler> = {
 	"/api/smart-duplicate": InstanceHandlers.smartDuplicate,
 	"/api/mass-duplicate": InstanceHandlers.massDuplicate,
 	"/api/clone-object": InstanceHandlers.cloneObject,
-	"/api/move-object": InstanceHandlers.moveObject,
 
 	"/api/get-script-source": ScriptHandlers.getScriptSource,
 	"/api/set-script-source": ScriptHandlers.setScriptSource,
@@ -60,7 +59,6 @@ const routeMap: Record<string, Handler> = {
 	"/api/insert-script-lines": ScriptHandlers.insertScriptLines,
 	"/api/delete-script-lines": ScriptHandlers.deleteScriptLines,
 
-	"/api/get-attribute": MetadataHandlers.getAttribute,
 	"/api/set-attribute": MetadataHandlers.setAttribute,
 	"/api/get-attributes": MetadataHandlers.getAttributes,
 	"/api/delete-attribute": MetadataHandlers.deleteAttribute,
@@ -92,7 +90,6 @@ const routeMap: Record<string, Handler> = {
 	"/api/simulate-keyboard-input": InputHandlers.simulateKeyboardInput,
 
 	"/api/find-and-replace-in-scripts": ScriptHandlers.findAndReplaceInScripts,
-	"/api/get-script-analysis": ScriptHandlers.getScriptAnalysis,
 };
 
 function processRequest(request: RequestPayload): unknown {

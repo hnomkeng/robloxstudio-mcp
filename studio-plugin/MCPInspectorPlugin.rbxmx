@@ -92,13 +92,11 @@ local routeMap = {
 	["/api/smart-duplicate"] = InstanceHandlers.smartDuplicate,
 	["/api/mass-duplicate"] = InstanceHandlers.massDuplicate,
 	["/api/clone-object"] = InstanceHandlers.cloneObject,
-	["/api/move-object"] = InstanceHandlers.moveObject,
 	["/api/get-script-source"] = ScriptHandlers.getScriptSource,
 	["/api/set-script-source"] = ScriptHandlers.setScriptSource,
 	["/api/edit-script-lines"] = ScriptHandlers.editScriptLines,
 	["/api/insert-script-lines"] = ScriptHandlers.insertScriptLines,
 	["/api/delete-script-lines"] = ScriptHandlers.deleteScriptLines,
-	["/api/get-attribute"] = MetadataHandlers.getAttribute,
 	["/api/set-attribute"] = MetadataHandlers.setAttribute,
 	["/api/get-attributes"] = MetadataHandlers.getAttributes,
 	["/api/delete-attribute"] = MetadataHandlers.deleteAttribute,
@@ -125,7 +123,6 @@ local routeMap = {
 	["/api/simulate-mouse-input"] = InputHandlers.simulateMouseInput,
 	["/api/simulate-keyboard-input"] = InputHandlers.simulateKeyboardInput,
 	["/api/find-and-replace-in-scripts"] = ScriptHandlers.findAndReplaceInScripts,
-	["/api/get-script-analysis"] = ScriptHandlers.getScriptAnalysis,
 }
 local function processRequest(request)
 	local endpoint = request.endpoint
@@ -2141,47 +2138,6 @@ local function cloneObject(requestData)
 		error = `Failed to clone object: {clone}`,
 	}
 end
-local function moveObject(requestData)
-	local instancePath = requestData.instancePath
-	local targetParentPath = requestData.targetParentPath
-	if not (instancePath ~= "" and instancePath) or not (targetParentPath ~= "" and targetParentPath) then
-		return {
-			error = "Instance path and target parent path are required",
-		}
-	end
-	local instance = getInstanceByPath(instancePath)
-	if not instance then
-		return {
-			error = `Instance not found: {instancePath}`,
-		}
-	end
-	local targetParent = getInstanceByPath(targetParentPath)
-	if not targetParent then
-		return {
-			error = `Target parent not found: {targetParentPath}`,
-		}
-	end
-	local recordingId = beginRecording(`Move {instance.Name}`)
-	local success, result = pcall(function()
-		instance.Parent = targetParent
-		return true
-	end)
-	if success then
-		finishRecording(recordingId, true)
-		return {
-			success = true,
-			instancePath = getInstancePath(instance),
-			name = instance.Name,
-			className = instance.ClassName,
-			parent = targetParentPath,
-			message = "Object moved successfully",
-		}
-	end
-	finishRecording(recordingId, false)
-	return {
-		error = `Failed to move object: {result}`,
-	}
-end
 return {
 	createObject = createObject,
 	deleteObject = deleteObject,
@@ -2189,7 +2145,6 @@ return {
 	smartDuplicate = smartDuplicate,
 	massDuplicate = massDuplicate,
 	cloneObject = cloneObject,
-	moveObject = moveObject,
 }
 ]]></string>
           </Properties>
@@ -2344,37 +2299,6 @@ local function deserializeValue(attributeValue, valueType)
 		return BrickColor.new(_condition_1)
 	end
 	return attributeValue
-end
-local function getAttribute(requestData)
-	local instancePath = requestData.instancePath
-	local attributeName = requestData.attributeName
-	if not (instancePath ~= "" and instancePath) or not (attributeName ~= "" and attributeName) then
-		return {
-			error = "Instance path and attribute name are required",
-		}
-	end
-	local instance = getInstanceByPath(instancePath)
-	if not instance then
-		return {
-			error = `Instance not found: {instancePath}`,
-		}
-	end
-	local success, result = pcall(function()
-		local value = instance:GetAttribute(attributeName)
-		return {
-			instancePath = instancePath,
-			attributeName = attributeName,
-			value = serializeValue(value),
-			valueType = typeof(value),
-			exists = value ~= nil,
-		}
-	end)
-	if success then
-		return result
-	end
-	return {
-		error = `Failed to get attribute: {result}`,
-	}
 end
 local function setAttribute(requestData)
 	local instancePath = requestData.instancePath
@@ -2792,7 +2716,6 @@ local function bulkSetAttributes(requestData)
 	}
 end
 return {
-	getAttribute = getAttribute,
 	setAttribute = setAttribute,
 	getAttributes = getAttributes,
 	deleteAttribute = deleteAttribute,
@@ -4772,73 +4695,6 @@ local function findAndReplaceInScripts(requestData)
 		truncated = hitLimit,
 	}
 end
-local function getScriptAnalysis(requestData)
-	local instancePath = requestData.instancePath
-	if not (instancePath ~= "" and instancePath) then
-		return {
-			error = "Instance path is required",
-		}
-	end
-	local instance = getInstanceByPath(instancePath)
-	if not instance then
-		return {
-			error = `Instance not found: {instancePath}`,
-		}
-	end
-	local results = {}
-	local function analyzeScript(scriptInstance)
-		if not scriptInstance:IsA("LuaSourceContainer") then
-			return nil
-		end
-		local source = readScriptSource(scriptInstance)
-		local diagnostics = {}
-		local fn, compileError = loadstring(source)
-		local _value = not fn and compileError
-		if _value ~= "" and _value then
-			local lineStr = string.match(tostring(compileError), ":(%d+):")
-			local _arg0 = {
-				line = if lineStr ~= 0 and lineStr == lineStr and lineStr ~= "" and lineStr then tonumber(lineStr) else nil,
-				message = tostring(compileError),
-				severity = "error",
-			}
-			table.insert(diagnostics, _arg0)
-		end
-		local _arg0 = {
-			scriptPath = getInstancePath(scriptInstance),
-			scriptName = scriptInstance.Name,
-			diagnostics = diagnostics,
-			hasErrors = #diagnostics > 0,
-		}
-		table.insert(results, _arg0)
-	end
-	if instance:IsA("LuaSourceContainer") then
-		analyzeScript(instance)
-	else
-		for _, desc in instance:GetDescendants() do
-			analyzeScript(desc)
-		end
-	end
-	local _object = {
-		results = results,
-		totalScripts = #results,
-	}
-	local _left = "scriptsWithErrors"
-	-- ▼ ReadonlyArray.filter ▼
-	local _newValue = {}
-	local _callback = function(r)
-		return r.hasErrors
-	end
-	local _length = 0
-	for _k, _v in results do
-		if _callback(_v, _k - 1, results) == true then
-			_length += 1
-			_newValue[_length] = _v
-		end
-	end
-	-- ▲ ReadonlyArray.filter ▲
-	_object[_left] = #_newValue
-	return _object
-end
 return {
 	getScriptSource = getScriptSource,
 	setScriptSource = setScriptSource,
@@ -4846,7 +4702,6 @@ return {
 	insertScriptLines = insertScriptLines,
 	deleteScriptLines = deleteScriptLines,
 	findAndReplaceInScripts = findAndReplaceInScripts,
-	getScriptAnalysis = getScriptAnalysis,
 }
 ]]></string>
           </Properties>

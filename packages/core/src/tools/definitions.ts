@@ -590,25 +590,6 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
 
   // === Attributes ===
   {
-    name: 'get_attribute',
-    category: 'read',
-    description: 'Get an attribute value',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        instancePath: {
-          type: 'string',
-          description: 'Instance path (dot notation)'
-        },
-        attributeName: {
-          type: 'string',
-          description: 'Attribute name'
-        }
-      },
-      required: ['instancePath', 'attributeName']
-    }
-  },
-  {
     name: 'set_attribute',
     category: 'write',
     description: 'Set an attribute. Supports primitives, Vector3, Color3, UDim2, BrickColor.',
@@ -1311,37 +1292,6 @@ part(0,2,0,2,1,1,"b")`,
     }
   },
   {
-    name: 'upload_decal',
-    category: 'write',
-    description: 'Upload an image file as a Decal asset to Roblox. Supports ROBLOSECURITY cookie auth (recommended, simpler) or ROBLOX_OPEN_CLOUD_API_KEY (needs asset:write scope + creator ID). Cookie auth is used automatically when ROBLOSECURITY is set. Response includes both decalId (Decal wrapper asset ID) and imageId (underlying image content ID — use this for ImageLabel.Image). For Open Cloud uploads, imageId is resolved via the connected Studio plugin (InsertService:LoadAsset); if the plugin is not connected, imageId is null.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        filePath: {
-          type: 'string',
-          description: 'Absolute path to the image file on disk (PNG, JPG, BMP, or TGA)'
-        },
-        displayName: {
-          type: 'string',
-          description: 'Display name for the decal asset (max 50 characters)'
-        },
-        description: {
-          type: 'string',
-          description: 'Description for the decal asset (default: empty string)'
-        },
-        userId: {
-          type: 'string',
-          description: 'Roblox user ID for the asset creator. Overrides ROBLOX_CREATOR_USER_ID env var.'
-        },
-        groupId: {
-          type: 'string',
-          description: 'Roblox group ID for the asset creator. Overrides ROBLOX_CREATOR_GROUP_ID env var. Takes precedence over userId if both provided.'
-        }
-      },
-      required: ['filePath', 'displayName']
-    }
-  },
-  {
     name: 'upload_asset',
     category: 'write',
     description: 'Upload any supported asset type to Roblox: Audio (mp3/ogg/wav/flac), Decal (png/jpg/bmp/tga), Model (fbx/gltf/glb/rbxm/rbxmx), Animation (rbxm/rbxmx), or Video (mp4/mov). Decal supports ROBLOSECURITY cookie auth or ROBLOX_OPEN_CLOUD_API_KEY. All other types require Open Cloud API key with asset:write scope + creator ID. Audio: max 7 min, 100 uploads/month (ID-verified). Video: max 5 min, requires 13+ ID-verified.',
@@ -1508,45 +1458,6 @@ part(0,2,0,2,1,1,"b")`,
       required: ['instancePath', 'targetParentPath']
     }
   },
-  {
-    name: 'move_object',
-    category: 'write',
-    description: 'Move (reparent) an instance to a new parent location. Preserves all children and properties.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        instancePath: {
-          type: 'string',
-          description: 'Path of the instance to move'
-        },
-        targetParentPath: {
-          type: 'string',
-          description: 'Path of the new parent'
-        }
-      },
-      required: ['instancePath', 'targetParentPath']
-    }
-  },
-  {
-    name: 'rename_object',
-    category: 'write',
-    description: 'Rename an instance.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        instancePath: {
-          type: 'string',
-          description: 'Path of the instance to rename'
-        },
-        newName: {
-          type: 'string',
-          description: 'New name for the instance'
-        }
-      },
-      required: ['instancePath', 'newName']
-    }
-  },
-
   // === Descendants & Comparison ===
   {
     name: 'get_descendants',
@@ -1610,22 +1521,6 @@ part(0,2,0,2,1,1,"b")`,
       }
     }
   },
-  {
-    name: 'get_script_analysis',
-    category: 'read',
-    description: 'Run syntax analysis on Luau scripts using loadstring. Detects compile errors with line numbers. Pass a script path to analyze one script, or a container path to analyze all scripts under it.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        instancePath: {
-          type: 'string',
-          description: 'Instance path - either a script or a container whose descendant scripts will be analyzed'
-        }
-      },
-      required: ['instancePath']
-    }
-  },
-
   // === Bulk Attributes ===
   {
     name: 'bulk_set_attributes',

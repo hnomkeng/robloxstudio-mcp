@@ -360,42 +360,6 @@ function cloneObject(requestData: Record<string, unknown>) {
 	return { error: `Failed to clone object: ${clone}` };
 }
 
-function moveObject(requestData: Record<string, unknown>) {
-	const instancePath = requestData.instancePath as string;
-	const targetParentPath = requestData.targetParentPath as string;
-
-	if (!instancePath || !targetParentPath) {
-		return { error: "Instance path and target parent path are required" };
-	}
-
-	const instance = getInstanceByPath(instancePath);
-	if (!instance) return { error: `Instance not found: ${instancePath}` };
-
-	const targetParent = getInstanceByPath(targetParentPath);
-	if (!targetParent) return { error: `Target parent not found: ${targetParentPath}` };
-
-	const recordingId = beginRecording(`Move ${instance.Name}`);
-
-	const [success, result] = pcall(() => {
-		instance.Parent = targetParent;
-		return true;
-	});
-
-	if (success) {
-		finishRecording(recordingId, true);
-		return {
-			success: true,
-			instancePath: getInstancePath(instance),
-			name: instance.Name,
-			className: instance.ClassName,
-			parent: targetParentPath,
-			message: "Object moved successfully",
-		};
-	}
-	finishRecording(recordingId, false);
-	return { error: `Failed to move object: ${result}` };
-}
-
 export = {
 	createObject,
 	deleteObject,
@@ -403,5 +367,4 @@ export = {
 	smartDuplicate,
 	massDuplicate,
 	cloneObject,
-	moveObject,
 };

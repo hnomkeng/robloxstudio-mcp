@@ -527,21 +527,6 @@ export class RobloxStudioTools {
     };
   }
 
-  async getAttribute(instancePath: string, attributeName: string) {
-    if (!instancePath || !attributeName) {
-      throw new Error('Instance path and attribute name are required for get_attribute');
-    }
-    const response = await this.client.request('/api/get-attribute', { instancePath, attributeName });
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(response)
-        }
-      ]
-    };
-  }
-
   async setAttribute(instancePath: string, attributeName: string, attributeValue: any, valueType?: string) {
     if (!instancePath || !attributeName) {
       throw new Error('Instance path and attribute name are required for set_attribute');
@@ -1491,85 +1476,6 @@ export class RobloxStudioTools {
     return null;
   }
 
-  async uploadDecal(
-    filePath: string,
-    displayName: string,
-    description?: string,
-    userId?: string,
-    groupId?: string
-  ) {
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`File not found: ${filePath}`);
-    }
-
-    const fileContent = fs.readFileSync(filePath);
-    const fileName = path.basename(filePath);
-
-    const resolvedGroupId = groupId || process.env.ROBLOX_CREATOR_GROUP_ID;
-    const resolvedUserId = userId || process.env.ROBLOX_CREATOR_USER_ID;
-
-    if (this.openCloudClient.hasApiKey() && (resolvedUserId || resolvedGroupId)) {
-      const creator: { userId?: string; groupId?: string } = {};
-      if (resolvedGroupId) {
-        creator.groupId = resolvedGroupId;
-      } else {
-        creator.userId = resolvedUserId;
-      }
-
-      const result = await this.openCloudClient.createAsset(
-        {
-          assetType: 'Decal',
-          displayName,
-          description: description || '',
-          creationContext: { creator },
-        },
-        fileContent,
-        fileName
-      );
-
-      const decalId = result.response?.assetId;
-      const imageId = decalId ? await this.resolveImageId(decalId) : null;
-
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            ...result,
-            decalId: decalId ?? null,
-            imageId,
-          })
-        }]
-      };
-    }
-
-    if (this.cookieClient.hasCookie()) {
-      const result = await this.cookieClient.uploadDecal(
-        fileContent,
-        displayName,
-        description || ''
-      );
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            done: true,
-            response: {
-              assetId: String(result.assetId),
-              displayName,
-              assetType: 'Decal',
-              decalId: String(result.assetId),
-              imageId: String(result.backingAssetId),
-            },
-          })
-        }]
-      };
-    }
-
-    throw new Error(
-      'No auth configured for asset upload. Set ROBLOX_OPEN_CLOUD_API_KEY + ROBLOX_CREATOR_USER_ID (recommended) or ROBLOSECURITY env var.'
-    );
-  }
-
   async uploadAsset(
     filePath: string,
     assetType: string,
@@ -1717,26 +1623,6 @@ export class RobloxStudioTools {
     return { content: [{ type: 'text', text: JSON.stringify(response) }] };
   }
 
-  async moveObject(instancePath: string, targetParentPath: string) {
-    if (!instancePath || !targetParentPath) {
-      throw new Error('instancePath and targetParentPath are required for move_object');
-    }
-    const response = await this.client.request('/api/move-object', { instancePath, targetParentPath });
-    return { content: [{ type: 'text', text: JSON.stringify(response) }] };
-  }
-
-  async renameObject(instancePath: string, newName: string) {
-    if (!instancePath || !newName) {
-      throw new Error('instancePath and newName are required for rename_object');
-    }
-    const response = await this.client.request('/api/set-property', {
-      instancePath,
-      propertyName: 'Name',
-      propertyValue: newName,
-    });
-    return { content: [{ type: 'text', text: JSON.stringify(response) }] };
-  }
-
   async getDescendants(instancePath: string, maxDepth?: number, classFilter?: string) {
     if (!instancePath) {
       throw new Error('instancePath is required for get_descendants');
@@ -1755,14 +1641,6 @@ export class RobloxStudioTools {
 
   async getOutputLog(maxEntries?: number, messageType?: string) {
     const response = await this.client.request('/api/get-output-log', { maxEntries, messageType });
-    return { content: [{ type: 'text', text: JSON.stringify(response) }] };
-  }
-
-  async getScriptAnalysis(instancePath: string) {
-    if (!instancePath) {
-      throw new Error('instancePath is required for get_script_analysis');
-    }
-    const response = await this.client.request('/api/get-script-analysis', { instancePath });
     return { content: [{ type: 'text', text: JSON.stringify(response) }] };
   }
 
